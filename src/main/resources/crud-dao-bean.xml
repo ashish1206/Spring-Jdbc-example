@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"> <!-- bean definitions here -->
+
+    <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="url" value="jdbc:postgresql://localhost:5432/todo_db"></property>
+        <property name="username" value="postgres"></property>
+        <property name="password" value="postgres"></property>
+        <property name="driverClassName" value="org.postgresql.Driver"></property>
+    </bean>
+
+    <bean id="jtemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+        <constructor-arg ref="ds"></constructor-arg>
+    </bean>
+
+    <bean id="crudDaoBean" class="com.example.RelationalDb.dao.CRUDDaoImpl">
+        <property name="namedParameterJdbcTemplate" ref="jtemplate"></property>
+        <property name="insertUser" value="insert into users (username, date_of_birth)
+        values(:username, :dateOfBirth)"></property>
+        <property name="insertAddress" value="insert into address (door, street, landmark, city, user_id)
+           values(:door, :street, :landmark, :city, :userId)"></property>
+        <property name="fetchUserDetails" value="select * from users where username = :username"></property>
+        <property name="fetchAddress" value="select * from address where user_id =
+        (select user_id from users where username = :username)"></property>
+    </bean>
+</beans>
